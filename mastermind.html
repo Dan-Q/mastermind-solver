@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mastermind Solver</title>
+  <style type="text/css">
+    * {
+      box-sizing: border-box;
+      font-family: sans-serif;
+    }
+    #input {
+      display: flex;
+    }
+    label {
+      cursor: pointer;
+    }
+    input[type="radio"] {
+      all: unset;
+    }
+    .bulls-cows-wrapper {
+      border: 1px solid #777;
+      border-right: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    input[type="number"] {
+      all: unset;
+      max-width: 5em;
+      background: #ddd;
+      margin: 4px;
+      padding: 6px;
+      color: black;
+    }
+    #submit {
+      all: unset;
+      border: 1px solid #777;
+      border-radius: 0 25% 25% 0;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+    .color-picker {
+      list-style: none;
+      margin: 0;
+      padding: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      max-width: 135px;
+      border: 1px solid #777;
+      border-right: 0;
+      justify-content: center;
+    }
+    .color-label {
+      display: inline-block;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      border: 2px solid #aaa;
+      margin: 1px;
+      opacity: 0.4;
+    }
+    input[type="radio"]:checked + label {
+      border-color: black;
+      opacity: 1;
+    }
+    .color-label span {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+    #color-reject {
+      border: 0;
+    }
+    #color-reject label {
+      opacity: 1;
+    }
+    button:focus, input[type="number"]:focus, input[type="radio"]:focus + label {
+      outline: 4px solid #ffe300 !important;
+    }
+    button:hover, input[type="number"]:hover, input[type="radio"] + label:hover {
+      outline: 4px solid #ff61c9 !important;
+    }
+  </style>
+</head>
+<body>
+  <h1>Mastermind Solver</h1>
+  <div id="output">
+    ...loading... please wait...
+  </div>
+  <div id="input" style="display: none;">
+  </div>
+  <h2>Options</h2>
+  <div id="options" style="display: none;">
+    <button id="reject-duplicates">Reject duplicates</button> (if you're disallowing multiple pegs of the same color in the code)<br>
+    Reject a color: <span id="rejects"></span> (if you're playing with less than a full set of 8 colors)
+  </div>
+
+  <script type="text/javascript">
+    /*! reef v12.0.1 | (c) 2022 Chris Ferdinandi | MIT License | http://github.com/cferdinandi/reef */
+    const reef=function(e){"use strict";function t(e,t,n=document){let r=new CustomEvent("reef:"+e,{bubbles:!0,cancelable:!0,detail:t});return n.dispatchEvent(r)}function n(e){return"string"==typeof e?document.querySelector(e):e}function r(e){return Object.prototype.toString.call(e).slice(8,-1).toLowerCase()}class o{constructor(e,n,o=""){let i="store"+(o?"-"+o:"");Object.defineProperties(this,{data:{get:()=>function e(t){let n=r(t);return"object"===n?function(){let n={};for(let r in t)Object.prototype.hasOwnProperty.call(t,r)&&(n[r]=e(t[r]));return n}():"array"===n?t.map((function(t){return e(t)})):t}(e),set:()=>!0}});for(let r in n)"function"==typeof n[r]&&(this[r]=function(...o){n[r](e,...o),t(i,e)})}}let i=["input","option","textarea"],l=["value","checked","selected"],s=["checked","selected"];function c(e){return["false","null","undefined","0","-0","NaN","0n","-0n"].includes(e)}function u(e,t,n){let r=t.replace(/\s+/g,"").toLowerCase();return!(!["src","href","xlink:href"].includes(e)||!r.includes("javascript:")&&!r.includes("data:text/html"))||(!(n||!e.startsWith("on"))||void 0)}function d(e,t,n,r){u(t,n,r)||(l.includes(t)&&(e[t]="value"===t?n:" "),e.setAttribute(t,n))}function a(e,t){l.includes(t)&&(e[t]=""),e.removeAttribute(t)}function f(e,t){if(1===e.nodeType){for(let{name:n,value:r}of e.attributes){if(u(n,r,t)){a(e,n);continue}if(!n.startsWith("@")&&!n.startsWith("#"))continue;let o=n.slice(1);a(e,n),s.includes(o)&&c(r)||d(e,o,r,t)}if(e.childNodes)for(let n of e.childNodes)f(n,t)}}function h(e){return e.childNodes&&e.childNodes.length?null:e.textContent}function m(e,t){return e.nodeType!==t.nodeType||e.tagName!==t.tagName||e.id!==t.id||e.src!==t.src}function p(e,t,n){let r=e.childNodes,o=t.childNodes;(function(e){let t=e.querySelectorAll("script");for(let e of t)e.remove()})(e)||(r.forEach((function(e,r){if(!o[r]){let r=e.cloneNode(!0);return f(r,n),void t.append(r)}if(m(e,o[r])){let t=function(e,t,n){return Array.from(t).slice(n+1).find((function(t){return!m(e,t)}))}(e,o,r);if(!t){let t=e.cloneNode(!0);return f(t,n),void o[r].before(t)}o[r].before(t)}if(function(e,t,n){if(1!==e.nodeType)return;let r=e.attributes,o=t.attributes;for(let{name:o,value:u}of r){if(o.startsWith("#"))continue;if(l.includes(o)&&i.includes(e.tagName.toLowerCase()))continue;let r=o.startsWith("@")?o.slice(1):o;s.includes(r)&&c(u)?a(t,r):d(t,r,u,n)}for(let{name:e,value:n}of o)r[e]||l.includes(e)&&i.includes(t.tagName.toLowerCase())||a(t,e)}(e,o[r],n),e.nodeName.includes("-"))return;let u=h(e);if(u&&u!==h(o[r])&&(o[r].textContent=u),e.childNodes.length||!o[r].childNodes.length){if(!o[r].childNodes.length&&e.childNodes.length){let t=document.createDocumentFragment();return p(e,t,n),void o[r].appendChild(t)}e.childNodes.length&&p(e,o[r],n)}else o[r].innerHTML=""})),function(e,t){let n=e.length-t.length;if(!(n<1))for(;n>0;n--)e[e.length-1].remove()}(o,r))}function b(e,r,o){let i=n(e);p(function(e){let t=(new DOMParser).parseFromString(e,"text/html");return t.head&&t.head.childNodes.length&&Array.from(t.head.childNodes).reverse().forEach((function(e){t.body.insertBefore(e,t.body.firstChild)})),t.body||document.createElement("body")}(r),i,o),t("render",null,i)}class v{constructor(e,t,n){var r;this.elem=e,this.template=t,this.stores=n.stores?n.stores.map(e=>"reef:store-"+e):["reef:store"],this.events=n.events,this.handler=(r=this,function(e){r.render()}),this.debounce=null,this.start()}start(){for(let e of this.stores)document.addEventListener(e,this.handler);this.render(),t("start",null,n(this.elem))}stop(){for(let e of this.stores)document.removeEventListener(e,this.handler);t("stop",null,n(this.elem))}render(){let e=this;e.debounce&&window.cancelAnimationFrame(e.debounce),e.debounce=window.requestAnimationFrame((function(){b(e.elem,e.template(),e.events)}))}}return e.component=function(e,t,n={}){return new v(e,t,n)},e.render=b,e.setter=function(e={},t={},n=""){return new o(e,t,n)},e.store=function(e={},n=""){return new Proxy(e,function e(n,o){let i="store"+(n?"-"+n:"");return{get:(t,i)=>"_isProxy"===i||(["object","array"].includes(r(t[i]))&&!t[i]._isProxy&&(t[i]=new Proxy(t[i],e(n,o))),t[i]),set:(e,n,r)=>(e[n]===r||(e[n]=r,t(i,o)),!0),deleteProperty:(e,n)=>(delete e[n],t(i,o),!0)}}(n,e))},e}({});
+
+    /* Mastermind Solver */
+    const data = reef.store({
+      colors: ['red', 'orange', 'yellow', 'green', 'blue', 'pink', 'purple', 'white'],
+      candidates: [],
+      nextGuess: '...',
+    });
+
+    /**
+     * Decode a candidate into four peg values by using binary bitwise operations.
+     */
+    function decodeCandidate(candidate){
+      return [
+        (candidate & 0b111000000000) / 0b001000000000,
+        (candidate & 0b000111000000) / 0b000001000000,
+        (candidate & 0b000000111000) / 0b000000001000,
+        (candidate & 0b000000000111) / 0b000000000001
+      ];
+    }
+
+    /**
+     * Given an array of four integers (0-7) to represent the pegs, in order, returns a single-number
+     * candidate representation.
+     */
+    function encodeCandidate(pegs) {
+      return pegs.reduce((a, b)=>(a << 3) + b);
+    }
+
+    /**
+     * Given a solution and a guess, returns an array representing the number of bulls/cows for that guess.
+     */
+    function getScore(solution, guessParts) {
+      let score = [0, 0];
+      let solutionParts = decodeCandidate(solution);
+      let guessPartsClone = [...guessParts]; // clone to not tamper the original
+      // Check for bulls:
+      for(let i = 0; i < 4; i++){
+        if(guessPartsClone[i] == solutionParts[i]) {
+          // If you guess the right thing in the right place, that's a bull:
+          score[0]++;
+          guessPartsClone[i] = -2; // unset that guess part so we don't try it in the search for cows
+          solutionParts[i] = -1; // unset that solution part so we don't find it in the search for cows
+        }
+      }
+      // Check for cows:
+      for(let i = 0; i < 4; i++){      
+        const foundAtPosition = solutionParts.indexOf(guessPartsClone[i]);
+        if(foundAtPosition > -1) {
+          // If you guess the right thing in the wrong place, that's a cow:
+          score[1]++;
+          solutionParts[foundAtPosition] = -1; // unset that solution part so we don't find it in the search for more cows
+        }
+      }
+      return score;
+    }
+
+    /**
+     * Given a guess (array of four integers from 0-7 to represent the pegs, in order) and the number
+     * of bulls (number of pegs in the guess that are in the right place) and cows (number of pegs in the
+     * guess that are correct but in the wrong place), eliminates from the candidates array all guesses
+     * invalidated by this result. Return true if successful, false otherwise.
+     */
+    function eliminateCandidates(guess, bulls, cows){
+      const newCandidatesList = data.candidates.filter(candidate=>{
+        const score = getScore(candidate, guess);
+        return (score[0] == bulls) && (score[1] == cows);
+      });
+      if(newCandidatesList.length == 0) {
+        alert('That response would reduce the candidate list to zero.');
+        return false;
+      }
+      data.candidates = newCandidatesList;
+      chooseNextGuess();
+      return true;
+    }
+
+    /**
+     * Sets the suggested "next guess" number to a random remaining candidate index.
+     */
+    function chooseNextGuess(){
+      const nextGuessNum = Math.floor(Math.random() * data.candidates.length);
+      const decodedNextGuess = decodeCandidate(data.candidates[nextGuessNum]);
+      data.nextGuess = numbersToColors(data.candidates[nextGuessNum]);
+      console.log(data.nextGuess);
+      console.log(numbersToColors(data.candidates[nextGuessNum]));
+      [...document.querySelectorAll('#input input[type="radio"]:checked')].forEach(i=>i.checked=false);
+      console.log(decodedNextGuess);
+      decodedNextGuess.forEach((g,i)=>{
+        console.log(`color-${i}-${g}`);
+        document.getElementById(`color-${i}-${g}`).checked=true;
+      });
+    }
+
+    /**
+     * Given a candidate, decodes it into peg numbers and then those peg numbers into peg colors and
+     * returns the resulting array.
+     */
+    function numbersToColors(candidate){
+      return decodeCandidate(candidate).map(p=>data.colors[p]);
+    }
+
+    /**
+     * Write to candidates list an array of all 4,096 possible candidates for four pegs of eight colours.
+     * (Eight colours needs a three-bit binary number, multiplied by four pegs gives a 12-bit number.)
+     * Also choose a random one for the first guess.
+     */
+    function resetGame(){
+      for(let i = 0; i <= 0b111111111111; i++) data.candidates.push(i);
+      chooseNextGuess();
+    }
+
+    // Try it against https://webgamesonline.com/mastermind/index.php !
+
+    // UI
+    function generateColorSelectorHTML(index){
+      const colorOptionsHTML = data.colors.map((c,i)=>`<li class="color-wrapper-${i}"><input type="radio" id="color-${index}-${i}" name="color-${index}" value="${i}"><label class="color-label" style="background-color: ${c};" for="color-${index}-${i}"><span>${c}</span></label></li>`).join('');
+      return `<ul id="color-${index}" class="color-picker">${colorOptionsHTML}</ul>`;
+    }
+
+    function generateGuessCircles(guess){
+      return guess.map(c=>`<span class="color-label" style="background-color: ${c}; opacity: 1;"></span>`).join('');
+    }
+    
+    const colorSelectorsHTML = [0,1,2,3].map(s=>generateColorSelectorHTML(s)).join('');
+    reef.component('#output', ()=>{
+      let candidatesHTML = '';
+      if(data.candidates.length < 7) {
+        candidatesHTML = data.candidates.map(c=>`<li>${generateGuessCircles(numbersToColors(c))}</li>`).join('');
+      }
+      return `
+        <h2>Candidate pool</h2>
+        <p>${data.candidates.length} solutions are still possible.</p>
+        <ul>${candidatesHTML}</ul>
+        <h2>Next Guess</h2>
+        <p>Try this: ${generateGuessCircles(data.nextGuess)} (${data.nextGuess.join(', ')})</p>
+      `;
+    });
+    document.getElementById('input').innerHTML = colorSelectorsHTML + `
+      <div class="bulls-cows-wrapper">
+        <label for="bulls">Bulls</label>
+        <input id="bulls" type="number" value="0" min="0" max="4">
+      </div>
+      <div class="bulls-cows-wrapper">
+        <label for="cows">Cows</label>
+        <input id="cows" type="number" value="0" min="0" max="4">
+      </div>
+      <button id="submit">Submit</button>
+    `;
+    document.getElementById('input').style.display = '';
+    document.getElementById('options').style.display = '';
+    const bullsInput = document.getElementById('bulls');
+    const cowsInput = document.getElementById('cows');
+
+    // Input
+    document.getElementById('submit').addEventListener('click', ()=>{
+      const guess = [...document.querySelectorAll('#input input[type="radio"]:checked')].map(s=>parseInt(s.value));
+      // Safety-check: is proposed guess actually in search space?
+      if(!data.candidates.includes(encodeCandidate(guess))){
+        alert("That guess isn't in the remaining search space.");
+        return;
+      }
+      eliminateCandidates(guess, bullsInput.value, cowsInput.value);
+    });
+
+    // Options
+    document.getElementById('rejects').innerHTML = generateColorSelectorHTML('reject');
+    const rejectDuplicatesButton = document.getElementById('reject-duplicates');
+    rejectDuplicatesButton.addEventListener('click', ()=>{
+      const newCandidatesList = data.candidates.filter(c=>{
+        const decodedCandidate = decodeCandidate(c);
+        const uniqDigits = decodedCandidate.filter((n,i)=>decodedCandidate.indexOf(n)==i);
+        return uniqDigits.length == decodedCandidate.length;
+      });
+      if(newCandidatesList.length == 0) {
+        alert('That action would reduce the candidate list to zero.');
+        return false;
+      }
+      data.candidates = newCandidatesList;
+      rejectDuplicatesButton.innerText = 'Duplicates rejected';
+      rejectDuplicatesButton.disabled = true;
+    });
+    document.getElementById('color-reject').addEventListener('change', e=>{
+      const colorToRemove = e.target.value;
+      // pretend we tried four of that colour and got no results:
+      if(!eliminateCandidates([colorToRemove, colorToRemove, colorToRemove, colorToRemove], 0, 0)) return;
+      document.querySelectorAll(`.color-wrapper-${colorToRemove}`).forEach(i=>{
+        i.style.visibility = 'hidden';
+      });
+      chooseNextGuess();
+    }, { capture: true });
+
+    // Start
+    resetGame();
+  </script>
+</body>
+</html>
