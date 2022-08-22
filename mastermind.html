@@ -285,6 +285,7 @@
       data.candidates = newCandidatesList;
       rejectDuplicatesButton.innerText = 'Duplicates rejected';
       rejectDuplicatesButton.disabled = true;
+      chooseNextGuess();
     });
     document.getElementById('color-reject').addEventListener('change', e=>{
       const colorToRemove = e.target.value;
