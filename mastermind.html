@@ -188,12 +188,8 @@
       const nextGuessNum = Math.floor(Math.random() * data.candidates.length);
       const decodedNextGuess = decodeCandidate(data.candidates[nextGuessNum]);
       data.nextGuess = numbersToColors(data.candidates[nextGuessNum]);
-      console.log(data.nextGuess);
-      console.log(numbersToColors(data.candidates[nextGuessNum]));
       [...document.querySelectorAll('#input input[type="radio"]:checked')].forEach(i=>i.checked=false);
-      console.log(decodedNextGuess);
       decodedNextGuess.forEach((g,i)=>{
-        console.log(`color-${i}-${g}`);
         document.getElementById(`color-${i}-${g}`).checked=true;
       });
     }
